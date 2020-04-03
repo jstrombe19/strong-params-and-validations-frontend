@@ -7,7 +7,7 @@ body {
     margin: 10px;
     background-color: rgb(210, 204, 173);
     border-radius: 5%;
-    box-shadow: 10px;
+    box-shadow: 0 4px 10px grey;
     padding: 10px;
 }
 
