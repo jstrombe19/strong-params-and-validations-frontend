@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     getExistingUserData()
 
+    const formSection = document.getElementById('forms-section')
     const newUserForm = document.getElementById('add-new-user')
     const userCardContainer = document.getElementById('user-card-container')
 
@@ -41,7 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(result => handleUserResponse(result, newUserForm))
         
     })
-
+    
     function createUserCard(user) {
         const userCard = document.createElement('div')
         userCard.className = "user-card"
@@ -51,10 +52,23 @@ document.addEventListener('DOMContentLoaded', () => {
         name.innerText = user.name
         username.innerText = user.username
         email.innerText = user.email
-        userCard.append(name, username, email)
+        userCard.append(name, username, email, createEditButton(user))
         userCardContainer.append(userCard)
     }
 
+    function createEditButton(user, event) {
+        const editButton = document.createElement('button')
+        editButton.innerText = "Edit User Info"
+        editButton.addEventListener('click', () => {
+            editUserInfo(user)
+        })
+        return editButton
+    }
+
+    function editUserInfo(user) {
+        console.log(user)
+    }
+    
     function handleUserResponse(response, form) {
         const errorMessage = document.getElementById('response-error-message')
         if (errorMessage) {
@@ -76,5 +90,42 @@ document.addEventListener('DOMContentLoaded', () => {
             newUserForm.append(responseMessage)
         }
     }
-
+    
 })
+
+    // function createEditButton(user) {
+    //     const editButton = document.createElement('button')
+    //     editButton.innerText = "Edit User Info"
+    //     editButton.addEventListener('click', () => {
+    //         createEditUserInfoForm(user)
+    //     })
+    //     return editButton
+    // }
+
+    // function updateUserInfo(user, event) {
+    //     event.preventDefault()
+    //     console.log(user)
+    //     console.log(event)
+    // }
+
+    // function createEditUserInfoForm(user) {
+    //     const editUserForm = document.createElement('form')
+    //     const nameInput = document.createElement('input')
+    //     nameInput.id = "name"
+    //     nameInput.name = "name"
+    //     nameInput.placeholder = user.name
+    //     const usernameInput = document.createElement('input')
+    //     usernameInput.name = "username"
+    //     usernameInput.id = "username"
+    //     usernameInput.placeholder = user.username
+    //     const emailInput = document.createElement('input')
+    //     emailInput.id = "email"
+    //     emailInput.name = "email"
+    //     emailInput.placeholder = user.email
+    //     const saveUserInfo = document.createElement('button')
+    //     saveUserInfo.type = "submit"
+    //     saveUserInfo.innerText = "Update User Info"
+    //     editUserForm.append(nameInput, usernameInput, emailInput, saveUserInfo)
+    //     editUserForm.addEventListener('submit', () => updateUserInfo("this will be a user object", event))
+    //     formSection.append(editUserForm)
+    // }
