@@ -66,7 +66,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function editUserInfo(user) {
-        console.log(user)
+        const editUserForm = document.createElement('form')
+        const nameInput = document.createElement('input')
+        const usernameInput = document.createElement('input')
+        const emailInput = document.createElement('input')
+        const passwordInput = document.createElement('input')
+        const editUserButton = document.createElement('button')
+        nameInput.name = "name"
+        nameInput.value = user.name
+        usernameInput.name = "username"
+        usernameInput.value = user.username
+        emailInput.name = "email"
+        emailInput.value = user.email
+        passwordInput.name = "password"
+        passwordInput.placeholder = "We didn't save your raw text password."
+        editUserButton.innerText = "Update User Info"
+        editUserButton.type = "submit"
+        editUserForm.append(nameInput, usernameInput, emailInput, passwordInput, editUserButton)
+        editUserForm.addEventListener('submit', () => {
+            event.preventDefault()
+            patchUserInfo(user, editUserForm)
+        })
+        formSection.append(editUserForm)
+    }
+
+    function patchUserInfo(user, form) {
+        const formData = new FormData(form)
+        const name = formData.get('name')
+        const username = formData.get('username')
+        const email = formData.get('email')
+        const password = formData.get('password')
+        const updatedUser = { user: {
+            name: name,
+            username: username,
+            email: email,
+            password: password
+        }}
+        fetch(`http://localhost:3000/users/${user.id}`, {
+            method: "PATCH",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(updatedUser)
+        })
+        .then(response => response.json())
+        .then(result => handleUserResponse(result, newUserForm))
     }
     
     function handleUserResponse(response, form) {
