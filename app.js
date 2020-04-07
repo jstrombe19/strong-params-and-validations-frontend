@@ -39,20 +39,24 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify(newUser)
         })
         .then(response => response.json())
-        .then(result => handleUserResponse(result, newUserForm))
+        .then(result => handleUserResponse(result, newUserForm, true))
         
     })
     
     function createUserCard(user) {
         const userCard = document.createElement('div')
         userCard.className = "user-card"
+        userCard.id = user.id
         const name = document.createElement('h3')
         const username = document.createElement('p')
         const email = document.createElement('p')
         name.innerText = user.name
+        name.id = `user${user.id}-name`
         username.innerText = user.username
+        username.id = `user${user.id}-username`
         email.innerText = user.email
-        userCard.append(name, username, email, createEditButton(user))
+        email.id = `user${user.id}-email`
+        userCard.append(name, username, email, createEditButton(user), createDeleteButton(user))
         userCardContainer.append(userCard)
     }
 
@@ -63,6 +67,30 @@ document.addEventListener('DOMContentLoaded', () => {
             editUserInfo(user)
         })
         return editButton
+    }
+
+    function createDeleteButton(user, event) {
+        const deleteButton = document.createElement('button')
+        deleteButton.innerText = "Delete User"
+        deleteButton.addEventListener('click', () => {
+            deleteUser(user)
+        })
+        return deleteButton
+    }
+
+    function deleteUser(user) {
+        const userCard = document.getElementById(user.id)
+        // userCard.remove()
+        userCardContainer.removeChild(userCard)      
+        fetch(`http://localhost:3000/users/${user.id}`, {
+            method: "DELETE",
+            headers: {
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }
+        })
+        .then(response => response.json())
+        .then(result => console.log(result))
     }
 
     function editUserInfo(user) {
@@ -90,6 +118,11 @@ document.addEventListener('DOMContentLoaded', () => {
         formSection.append(editUserForm)
     }
 
+    function updateUserCard(user, id) {
+        const name = document.getElementById(`user${id}-name`)
+        name.innerText = user.name
+    }
+
     function patchUserInfo(user, form) {
         const formData = new FormData(form)
         const name = formData.get('name')
@@ -102,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             email: email,
             password: password
         }}
+        updateUserCard(updatedUser.user, user.id)
         fetch(`http://localhost:3000/users/${user.id}`, {
             method: "PATCH",
             headers: {
@@ -111,15 +145,15 @@ document.addEventListener('DOMContentLoaded', () => {
             body: JSON.stringify(updatedUser)
         })
         .then(response => response.json())
-        .then(result => handleUserResponse(result, newUserForm))
+        .then(result => handleUserResponse(result, newUserForm, false))
     }
     
-    function handleUserResponse(response, form) {
+    function handleUserResponse(response, form, newUser) {
         const errorMessage = document.getElementById('response-error-message')
         if (errorMessage) {
             newUserForm.removeChild(errorMessage)
         }
-        if (response.user) {
+        if (response.user && newUser) {
             createUserCard(response.user)
             form.reset()
         } else {
